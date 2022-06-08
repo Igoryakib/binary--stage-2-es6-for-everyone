@@ -1,0 +1,70 @@
+.fighter-preview___root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-basis: 250px;
+  height: 250px;
+}
+
+.fighter-preview___right {
+  align-items: flex-end;
+}
+
+.fighter-preview___left {
+  align-items: flex-start;
+}
+
+.fighter-preview___img {
+  width: fit-content;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.fighter-preview___name {
+  margin: 6px auto 6px;
+  padding: 0;
+  color: black;
+  -webkit-text-fill-color: white;
+  -webkit-text-stroke-width: 1px;
+  font-size: 21px;
+  font-family: 'Arial Black';
+  font-weight: 700;  
+}
+
+.fighter-preview___list {
+  margin: 0 auto;
+  padding: 0;
+  width: 100px;
+  height: 100px;
+  list-style: none;
+}
+
+.fighter-preview___list-item {
+  margin: 0;
+  padding: 0;
+  color: black;
+  -webkit-text-fill-color: white;
+  -webkit-text-stroke-width: 1px;
+  font-size: 16px;
+  font-family: 'Arial Black';
+  font-weight: 600;
+}
+
+.fighter-preview___list-item--color {
+  color: #ba0303;
+  margin: 0;
+  padding: 0;
+}
+
+.winner-preview {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 400px;
+  flex-direction: row;
+}
+
+.fighter-preview__wrapperText {
+  margin: 0 auto;
+}
