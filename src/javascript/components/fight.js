@@ -6,12 +6,13 @@ export async function fight(firstFighter, secondFighter) {
   let healthSecondFighter = secondFighter.health;
   let healthFirstFighter = firstFighter.health;
   let fighterAttacked = true;
-  let criticalHit = false;
+  let criticalHit = true;
   let pressedKey = new Set();
   return new Promise((resolve) => {
     // resolve the promise with the winner when fight is over
     window.addEventListener('keydown', (event) => {
       // attack logic
+      // first fighter
       if (event.code === controls.PlayerOneAttack) {
         if (fighterAttacked) {
           let damage = getDamage(firstFighter, secondFighter)
@@ -21,6 +22,7 @@ export async function fight(firstFighter, secondFighter) {
           return fighterAttacked = true;
         }
       }
+      // second fighter
       if (event.code === controls.PlayerTwoAttack) {
         if(fighterAttacked) {
           let damage = getDamage(secondFighter, firstFighter)
@@ -30,32 +32,56 @@ export async function fight(firstFighter, secondFighter) {
           return fighterAttacked = true;
         }
       }
-      // critical hit logic 
+      // critical hit logic
+      // first fighter 
       pressedKey.add(event.code);
-      let timerId;
+      let timerIdFirstFighter;
       if(pressedKey.has(controls.PlayerOneCriticalHitCombination[0]) && pressedKey.has(controls.PlayerOneCriticalHitCombination[1]) && pressedKey.has(controls.PlayerOneCriticalHitCombination[2])){
         pressedKey.clear();
-        clearTimeout(timerId);
-        criticalHit = true;
-        let damage = getDamage(firstFighter, secondFighter, criticalHit)
-        healthSecondFighter -= damage;
+        let CriticalDamage = getDamage(firstFighter, secondFighter, criticalHit);
+        criticalHit = false;
+        timerIdFirstFighter = setTimeout(() => {
+          criticalHit = true;
+          if (criticalHit) {
+            clearTimeout(timerIdFirstFighter);
+          }
+        }, 10000)
+        healthSecondFighter -= CriticalDamage;
         healthBarSecondFighter.style.width = `${healthSecondFighter * 100 / secondFighter.health}%`;
-      } else {
+      }
+      // second fighter
+      let timerIdSecondFighter;
+      if(pressedKey.has(controls.PlayerTwoCriticalHitCombination[0]) && pressedKey.has(controls.PlayerTwoCriticalHitCombination[1]) && pressedKey.has(controls.PlayerTwoCriticalHitCombination[2])){
+        pressedKey.clear();
+        let CriticalDamage = getDamage(secondFighter, firstFighter, criticalHit);
+        criticalHit = false;
+        timerIdSecondFighter = setTimeout(() => {
+          criticalHit = true;
+          if (criticalHit) {
+            clearTimeout(timerIdSecondFighter);
+          }
+        }, 10000)
+        healthFirstFighter -= CriticalDamage;
+        healthBarFirstFighter.style.width = `${healthFirstFighter * 100 / firstFighter.health}%`;
       }
       // block logic
+      // first fighter
       if (event.code === controls.PlayerOneBlock) {
         fighterAttacked = false;
        return getDamage(0, firstFighter);
       }
+      // second fighter
       if (event.code === controls.PlayerTwoBlock) {
         fighterAttacked = false;
         return getDamage(0, secondFighter);
       }
       // choosing winner
+      // first fighter
       if(healthSecondFighter <= 0) {
         healthBarSecondFighter.style.width = '0%';
         return resolve(firstFighter);
       }
+      // second fighter
       if (healthFirstFighter <= 0) {
         healthBarFirstFighter.style.width = '0%';
         return resolve(secondFighter);
@@ -64,29 +90,41 @@ export async function fight(firstFighter, secondFighter) {
   });
 }
 
-export function getDamage(attacker, defender, criticalHit = false) {
+export function getDamage(attacker, defender, criticalHit = 'block') {
   // return damage
-  if (getHitPower(attacker, criticalHit) < getBlockPower(defender) || getHitPower(attacker) === 0) {
+  let hit = getHitPower(attacker);
+  let block = getBlockPower(defender);
+  if (criticalHit === true) {
+    let criticalChance = getCriticalHitPower(attacker);
+    return criticalChance;
+  }
+  if (!criticalHit) {
     return 0;
   }
-  let hit = getHitPower(attacker, criticalHit);
-  let block = getBlockPower(defender);
+  if (getHitPower(attacker) < getBlockPower(defender) || getHitPower(attacker) === 0) {
+    return 0;
+  }
   if((hit - block) < 0) {
     return 0;
   }
-  return hit - block;
+  if (criticalHit === 'block') {
+    return hit - block;
+  }
 }
 
-export function getHitPower(fighter, criticalHit) {
+export function getHitPower(fighter) {
   // return hit power
-  if (criticalHit) {
-    criticalHit = false;
-    return (2 * (+fighter.attack ?? 0) ) * Math.random() * (2 - 1) + 1
-  }
-  return (+fighter.attack ?? 0) * Math.random() * (2 - 1) + 1;
+  let criticalHitChance = Math.random() * (2 - 1) + 1;
+  return (+fighter.attack ?? 0) * criticalHitChance;
+}
+
+export function getCriticalHitPower (fighter) {
+  // return critical hit
+  return (+fighter.attack ?? 0) * 2;
 }
 
 export function getBlockPower(fighter) {
   // return block power
-  return +fighter?.defense * Math.random() * (2 - 1) + 1;
+  let dodgeChance = Math.random() * (2 - 1) + 1
+  return +fighter?.defense * dodgeChance;
 }
