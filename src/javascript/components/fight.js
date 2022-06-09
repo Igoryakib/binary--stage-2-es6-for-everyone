@@ -18,8 +18,6 @@ export async function fight(firstFighter, secondFighter) {
           let damage = getDamage(firstFighter, secondFighter)
           healthSecondFighter -= damage;
           healthBarSecondFighter.style.width = `${healthSecondFighter * 100 / secondFighter.health}%`;
-        } else {
-          return fighterAttacked = true;
         }
       }
       // second fighter
@@ -28,8 +26,6 @@ export async function fight(firstFighter, secondFighter) {
           let damage = getDamage(secondFighter, firstFighter)
           healthFirstFighter -= damage;
           healthBarFirstFighter.style.width = `${healthFirstFighter * 100 / firstFighter.health}%`;
-        } else {
-          return fighterAttacked = true;
         }
       }
       // critical hit logic
@@ -68,12 +64,20 @@ export async function fight(firstFighter, secondFighter) {
       // first fighter
       if (event.code === controls.PlayerOneBlock) {
         fighterAttacked = false;
-       return getDamage(0, firstFighter);
+        window.addEventListener('keyup', (event) => {
+          if(event.code === controls.PlayerOneBlock) {
+            fighterAttacked = true;
+          }
+        })
       }
       // second fighter
       if (event.code === controls.PlayerTwoBlock) {
         fighterAttacked = false;
-        return getDamage(0, secondFighter);
+        window.addEventListener('keyup', (event) => {
+          if(event.code === controls.PlayerTwoBlock) {
+            fighterAttacked = true;
+          }
+        })
       }
       // choosing winner
       // first fighter
@@ -101,7 +105,7 @@ export function getDamage(attacker, defender, criticalHit = 'block') {
   if (!criticalHit) {
     return 0;
   }
-  if (getHitPower(attacker) < getBlockPower(defender) || getHitPower(attacker) === 0) {
+  if (getHitPower(attacker) < getBlockPower(defender)) {
     return 0;
   }
   if((hit - block) < 0) {
@@ -115,12 +119,12 @@ export function getDamage(attacker, defender, criticalHit = 'block') {
 export function getHitPower(fighter) {
   // return hit power
   let criticalHitChance = Math.random() * (2 - 1) + 1;
-  return (+fighter.attack ?? 0) * criticalHitChance;
+  return +fighter?.attack * criticalHitChance;
 }
 
 export function getCriticalHitPower (fighter) {
   // return critical hit
-  return (+fighter.attack ?? 0) * 2;
+  return +fighter?.attack * 2;
 }
 
 export function getBlockPower(fighter) {
