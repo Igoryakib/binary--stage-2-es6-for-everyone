@@ -6,7 +6,8 @@ export async function fight(firstFighter, secondFighter) {
   let healthSecondFighter = secondFighter.health;
   let healthFirstFighter = firstFighter.health;
   let fighterAttacked = true;
-  let criticalHit = true;
+  let criticalHitFirstFighter = true;
+  let criticalHitSecondFighter = true;
   let pressedKey = new Set();
   return new Promise((resolve) => {
     // resolve the promise with the winner when fight is over
@@ -32,13 +33,13 @@ export async function fight(firstFighter, secondFighter) {
       // first fighter 
       pressedKey.add(event.code);
       let timerIdFirstFighter;
-      if(pressedKey.has(controls.PlayerOneCriticalHitCombination[0]) && pressedKey.has(controls.PlayerOneCriticalHitCombination[1]) && pressedKey.has(controls.PlayerOneCriticalHitCombination[2])){
+      if(controls.PlayerOneCriticalHitCombination.every(item => pressedKey.has(item))){
         pressedKey.clear();
-        let CriticalDamage = getDamage(firstFighter, secondFighter, criticalHit);
-        criticalHit = false;
+        let CriticalDamage = getDamage(firstFighter, secondFighter, criticalHitFirstFighter);
+        criticalHitFirstFighter = false;
         timerIdFirstFighter = setTimeout(() => {
-          criticalHit = true;
-          if (criticalHit) {
+          criticalHitFirstFighter = true;
+          if (criticalHitFirstFighter) {
             clearTimeout(timerIdFirstFighter);
           }
         }, 10000)
@@ -47,13 +48,13 @@ export async function fight(firstFighter, secondFighter) {
       }
       // second fighter
       let timerIdSecondFighter;
-      if(pressedKey.has(controls.PlayerTwoCriticalHitCombination[0]) && pressedKey.has(controls.PlayerTwoCriticalHitCombination[1]) && pressedKey.has(controls.PlayerTwoCriticalHitCombination[2])){
+      if(controls.PlayerTwoCriticalHitCombination.every(item => pressedKey.has(item))){
         pressedKey.clear();
-        let CriticalDamage = getDamage(secondFighter, firstFighter, criticalHit);
-        criticalHit = false;
+        let CriticalDamage = getDamage(secondFighter, firstFighter, criticalHitSecondFighter);
+        criticalHitSecondFighter = false;
         timerIdSecondFighter = setTimeout(() => {
-          criticalHit = true;
-          if (criticalHit) {
+          criticalHitSecondFighter = true;
+          if (criticalHitSecondFighter) {
             clearTimeout(timerIdSecondFighter);
           }
         }, 10000)

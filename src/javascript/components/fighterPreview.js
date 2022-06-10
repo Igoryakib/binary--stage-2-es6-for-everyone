@@ -22,7 +22,7 @@ export function createFighterPreview(fighter, position) {
     fighterElement.append(fighterImage, wrapperText);
     return fighterElement;
   }
-  return ''; 
+  return fighterElement; 
 }
 
 export function createFighterImage(fighter) {
